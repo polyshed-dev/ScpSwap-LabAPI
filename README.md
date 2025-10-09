@@ -3,10 +3,10 @@
 ##### This was originally [BuildBoy12](https://github.com/BuildBoy12-SL/ScpSwap) version
 ##### I may maintain this plugin if I get his permission
 
-![Downloads](https://img.shields.io/github/downloads/SnivyFilms/ScpSwap/total.svg)
+![Downloads](https://img.shields.io/github/downloads/tayjay/ScpSwap/total.svg)
 
 ### How do I download this?
-  - Go here and download the latest release, [https://github.com/SnivyFilms/ScpSwap/releases](https://github.com/SnivyFilms/ScpSwap/releases)
+  - Go here and download the latest release, [https://github.com/tayjay/ScpSwap/releases](https://github.com/tayjay/ScpSwap/releases)
 
 ### Default Config
 ```yml
