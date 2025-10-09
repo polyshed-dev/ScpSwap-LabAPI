@@ -5,19 +5,18 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using LabApi.Features;
+using LabApi.Loader.Features.Plugins;
+using LabApi.Loader.Features.Plugins.Enums;
+
 namespace ScpSwap
 {
     using System;
-    using Exiled.API.Features;
-    using Exiled.Events.EventArgs.Player;
-    using RemoteAdmin;
-    using PlayerHandlers = Exiled.Events.Handlers.Player;
-    using ServerHandlers = Exiled.Events.Handlers.Server;
 
     /// <summary>
     /// The main plugin class.
     /// </summary>
-    public class Plugin : Plugin<Config, Translation>
+    public class Plugin : Plugin<Config>
     {
         private EventHandlers eventHandlers;
 
@@ -26,48 +25,40 @@ namespace ScpSwap
         /// </summary>
         public static Plugin Instance { get; private set; }
 
-        /// <inheritdoc />
-        public override string Author => "Vicious Vikki";
+        public override string Description { get; } = "A plugin for SCP:SL that allows Scps to swap roles with each other";
 
         /// <inheritdoc />
-        public override string Name => "ScpSwap";
+        public override string Author => "TayTay";
 
-        /// <inheritdoc />
-        public override string Prefix => "ScpSwap";
-
-        /// <inheritdoc />
-        public override Version RequiredExiledVersion { get; } = new Version(9, 9, 2);
-
-        /// <inheritdoc />
-        public override Version Version { get; } = new Version(1, 3, 0);
-
-        /// <inheritdoc />
-        public override void OnEnabled()
+        public override void Enable()
         {
             Instance = this;
 
-            eventHandlers = new EventHandlers(this);
-            PlayerHandlers.Spawned += eventHandlers.OnSpawned;
-            ServerHandlers.ReloadedConfigs += eventHandlers.OnReloadedConfigs;
-            ServerHandlers.RestartingRound += eventHandlers.OnRestartingRound;
-            ServerHandlers.WaitingForPlayers += eventHandlers.OnWaitingForPlayers;
+            eventHandlers = new EventHandlers();
+            eventHandlers.RegisterEvents();
             //PlayerHandlers.Left += eventHandlers.OnPlayerLeave;
-            base.OnEnabled();
         }
 
-        /// <inheritdoc />
-        public override void OnDisabled()
+        public override void Disable()
         {
-            PlayerHandlers.Spawned -= eventHandlers.OnSpawned;
-            ServerHandlers.ReloadedConfigs -= eventHandlers.OnReloadedConfigs;
-            ServerHandlers.RestartingRound -= eventHandlers.OnRestartingRound;
-            ServerHandlers.WaitingForPlayers -= eventHandlers.OnWaitingForPlayers;
-           //PlayerHandlers.Left -= eventHandlers.OnPlayerLeave;
+            //PlayerHandlers.Left -= eventHandlers.OnPlayerLeave;
+            if(eventHandlers != null)
+                eventHandlers.UnregisterEvents();
             eventHandlers = null;
 
             Instance = null;
 
-            base.OnDisabled();
         }
+
+        /// <inheritdoc />
+        public override string Name => "ScpSwap.LabAPI";
+
+        /// <inheritdoc />
+        public override Version Version { get; } = new Version(1, 3, 0);
+
+        public override LoadPriority Priority { get; } = LoadPriority.Low;
+
+        public override Version RequiredApiVersion { get; } = new Version(LabApiProperties.CompiledVersion);
+        
     }
 }

@@ -9,14 +9,12 @@ namespace ScpSwap
 {
     using System.Collections.Generic;
     using System.ComponentModel;
-    using Exiled.API.Features;
-    using Exiled.API.Interfaces;
     using PlayerRoles;
     using ScpSwap.Configs;
     using ScpSwap.Models;
 
     /// <inheritdoc />
-    public class Translation : ITranslation
+    public class Translation 
     {
         /// <summary>
         /// Gets or sets a collection of custom names with their correlating <see cref="RoleTypeId"/>.
@@ -49,13 +47,14 @@ namespace ScpSwap
         /// Gets or sets the message to be displayed to all Scp subjects at the start of the round.
         /// </summary>
         [Description("The message to be displayed to all Scp subjects at the start of the round.")]
-        public Broadcast StartMessage { get; set; } = new Broadcast("<color=yellow><b>Did you know you can swap classes with other SCP's?</b></color> Simply type <color=orange>.scpswap (role number)</color> in your in-game console (not RA) to swap!", 15);
+        public string StartMessage { get; set; } =
+            "<color=yellow><b>Did you know you can swap classes with other SCP's?</b></color> Simply type <color=orange>.scpswap (role number)</color> in your in-game console (not RA) to swap!";// 15);
 
         /// <summary>
         /// Gets or sets the broadcast to display to the receiver of a swap request.
         /// </summary>
         [Description("The broadcast to display to the receiver of a swap request.")]
-        public Broadcast RequestBroadcast { get; set; } = new Broadcast("<i>You have an SCP Swap request!\nCheck your console by pressing [`] or [~]</i>", 5);
+        public string RequestBroadcast { get; set; } = "<i>You have an SCP Swap request!\nCheck your console by pressing [`] or [~]</i>";//, 5);
 
         /// <summary>
         /// Gets or sets the console message to send to the receiver of a swap request.
@@ -84,7 +83,7 @@ namespace ScpSwap
         /// <summary>
         /// Gets or sets the various command instances to be translated.
         /// </summary>
-        [Description("The various command instances to be translated.")]
+        //[Description("The various command instances to be translated.")]
         public CommandTranslations CommandTranslations { get; set; } = new CommandTranslations();
         
         public string ExecutorIsntPlayer { get; set; } = "Command must be executed in-game.";

@@ -5,11 +5,11 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using LabApi.Events.Arguments.PlayerEvents;
+using LabApi.Features.Wrappers;
+
 namespace ScpSwap
 {
-    using Exiled.API.Features;
-    using Exiled.Events.EventArgs;
-    using Exiled.Events.EventArgs.Player;
     using MEC;
     using PlayerRoles;
     using ScpSwap.Models;
@@ -19,26 +19,21 @@ namespace ScpSwap
     /// </summary>
     public class EventHandlers
     {
-        private readonly Plugin plugin;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="EventHandlers"/> class.
-        /// </summary>
-        /// <param name="plugin">An instance of the <see cref="Plugin"/> class.</param>
-        public EventHandlers(Plugin plugin) => this.plugin = plugin;
+        
 
         /// <inheritdoc cref="Exiled.Events.Handlers.Server.OnRoundStarted"/>
-        public void OnSpawned(SpawnedEventArgs ev)
+        public void OnSpawned(PlayerSpawnedEventArgs ev)
         {
-            if ((ev.Player.IsScp || ValidSwaps.GetCustom(ev.Player) != null) && ev.OldRole.Type.GetTeam() != Team.SCPs && Round.ElapsedTime.TotalSeconds < plugin.Config.SwapTimeout)
-                ev.Player.Broadcast(plugin.Translation.StartMessage);
+            if ((ev.Player.IsSCP || ValidSwaps.GetCustom(ev.Player) != null) && ev.Player.ReferenceHub.roleManager.PreviouslySentRole[ev.Player.NetworkId].GetTeam() != Team.SCPs && Round.Duration.TotalSeconds < Plugin.Instance.Config.SwapTimeout) //If anything breaks, it's probably going to be this
+                ev.Player.SendBroadcast(Plugin.Instance.Config.Translation.StartMessage,15);
         }
 
-        /// <inheritdoc cref="Exiled.Events.Handlers.Server.OnReloadedConfigs"/>
+        /*/// <inheritdoc cref="Exiled.Events.Handlers.Server.OnReloadedConfigs"/>
         public void OnReloadedConfigs()
         {
             ValidSwaps.Refresh();
-        }
+        }*/
 
         /// <inheritdoc cref="Exiled.Events.Handlers.Server.OnRestartingRound"/>
         public void OnRestartingRound()
@@ -56,5 +51,19 @@ namespace ScpSwap
         {
             VolunteerSwap.ScpLeft(Player scpPlayer);
         }*/
+
+        public void RegisterEvents()
+        {
+            LabApi.Events.Handlers.PlayerEvents.Spawned += OnSpawned;
+            LabApi.Events.Handlers.ServerEvents.RoundRestarted += OnRestartingRound;
+            LabApi.Events.Handlers.ServerEvents.WaitingForPlayers += OnWaitingForPlayers;
+        }
+        
+        public void UnregisterEvents()
+        {
+            LabApi.Events.Handlers.PlayerEvents.Spawned -= OnSpawned;
+            LabApi.Events.Handlers.ServerEvents.RoundRestarted -= OnRestartingRound;
+            LabApi.Events.Handlers.ServerEvents.WaitingForPlayers -= OnWaitingForPlayers;
+        }
     }
 }

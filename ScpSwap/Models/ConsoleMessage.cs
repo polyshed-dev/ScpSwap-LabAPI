@@ -5,10 +5,11 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using LabApi.Features.Wrappers;
+
 namespace ScpSwap.Models
 {
     using System;
-    using Exiled.API.Features;
 
     /// <summary>
     /// Container to make translations for console messages more fun.

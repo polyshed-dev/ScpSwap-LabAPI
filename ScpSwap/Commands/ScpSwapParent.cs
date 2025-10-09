@@ -5,14 +5,15 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-using Exiled.Permissions.Extensions;
+using LabApi.Features.Permissions;
+using LabApi.Features.Wrappers;
 
 namespace ScpSwap.Commands
 {
     using System;
     using System.Linq;
     using CommandSystem;
-    using Exiled.API.Features;
+
     using PlayerRoles;
     using ScpSwap.Configs;
     using ScpSwap.Models;
@@ -36,16 +37,16 @@ namespace ScpSwap.Commands
 
         /// <inheritdoc />
         public override string Description => "Base command for ScpSwap.";
+        
 
         /// <inheritdoc />
         public sealed override void LoadGeneratedCommands()
         {
-            CommandTranslations commandTranslations = Plugin.Instance.Translation.CommandTranslations;
 
-            RegisterCommand(commandTranslations.Accept);
-            RegisterCommand(commandTranslations.Cancel);
-            RegisterCommand(commandTranslations.Decline);
-            RegisterCommand(commandTranslations.List);
+            RegisterCommand(new Accept());
+            RegisterCommand(new Cancel());
+            RegisterCommand(new Decline());
+            RegisterCommand(new List());
         }
 
         /// <inheritdoc />
@@ -54,19 +55,19 @@ namespace ScpSwap.Commands
             Player playerSender = Player.Get(sender);
             if (playerSender == null)
             {
-                response = Plugin.Instance.Translation.ExecutorIsntPlayer;
+                response = Plugin.Instance.Config.Translation.ExecutorIsntPlayer;
                 return false;
             }
 
-            if (!Round.IsStarted)
+            if (!Round.IsRoundStarted)
             {
-                response = Plugin.Instance.Translation.RoundIsntStarted;
+                response = Plugin.Instance.Config.Translation.RoundIsntStarted;
                 return false;
             }
 
-            if (Round.ElapsedTime.TotalSeconds > Plugin.Instance.Config.SwapTimeout)
+            if (Round.Duration.TotalSeconds > Plugin.Instance.Config.SwapTimeout)
             {
-                response = Plugin.Instance.Translation.SwapPeriodEnded;
+                response = Plugin.Instance.Config.Translation.SwapPeriodEnded;
                 return false;
             }
 
@@ -78,59 +79,59 @@ namespace ScpSwap.Commands
 
             if (Plugin.Instance.Config.AllowUserSwapByPermission)
             {
-                if (!playerSender.CheckPermission("scpswap.allowed"))
+                if (!playerSender.HasPermissions("scpswap.allowed"))
                 {
-                    response = Plugin.Instance.Translation.AllowUserSwapByPermission;
+                    response = Plugin.Instance.Config.Translation.AllowUserSwapByPermission;
                     return false;
                 }
             }
 
-            if (!playerSender.IsScp && ValidSwaps.GetCustom(playerSender) == null)
+            if (!playerSender.IsSCP && ValidSwaps.GetCustom(playerSender) == null)
             {
-                response = Plugin.Instance.Translation.NotAnScp;
+                response = Plugin.Instance.Config.Translation.NotAnScp;
                 return false;
             }
 
             if (Swap.FromSender(playerSender) != null)
             {
-                response = Plugin.Instance.Translation.AlreadyHasPendingRequest;
+                response = Plugin.Instance.Config.Translation.AlreadyHasPendingRequest;
                 return false;
             }
 
             Player receiver = GetReceiver(arguments.At(0), out Action<Player> spawnMethod);
             if (playerSender == receiver)
             {
-                response = Plugin.Instance.Translation.CannotSwapWithYourself;
+                response = Plugin.Instance.Config.Translation.CannotSwapWithYourself;
                 return false;
             }
 
-            if (Plugin.Instance.Config.BlacklistedSwapFromScps.Contains(playerSender.Role.Type))
+            if (Plugin.Instance.Config.BlacklistedSwapFromScps.Contains(playerSender.Role))
             {
-                response = Plugin.Instance.Translation.CannotSwapOffThisScp;
+                response = Plugin.Instance.Config.Translation.CannotSwapOffThisScp;
                 return false;
             }
 
             if (receiver != null)
             {
                 Swap.Send(playerSender, receiver);
-                response = Plugin.Instance.Translation.RequestSent;
+                response = Plugin.Instance.Config.Translation.RequestSent;
                 return true;
             }
 
             if (spawnMethod == null)
             {
-                response = Plugin.Instance.Translation.CannotFindRole;
+                response = Plugin.Instance.Config.Translation.CannotFindRole;
                 return false;
             }
 
             if (Plugin.Instance.Config.AllowNewScps)
             {
                 spawnMethod(playerSender);
-                response = Plugin.Instance.Translation.SuccessfulSwap;
+                response = Plugin.Instance.Config.Translation.SuccessfulSwap;
                 return true;
             }
 
-            response = Plugin.Instance.Translation.CannotFindPlayerWithRole;
+            response = Plugin.Instance.Config.Translation.CannotFindPlayerWithRole;
             return false;
         }
 
@@ -146,7 +147,7 @@ namespace ScpSwap.Commands
             RoleTypeId roleSwap = ValidSwaps.Get(request);
             if (roleSwap != RoleTypeId.None)
             {
-                spawnMethod = player => player.Role.Set(roleSwap);
+                spawnMethod = player => player.SetRole(roleSwap);
                 return Player.List.FirstOrDefault(player => player.Role == roleSwap);
             }
 

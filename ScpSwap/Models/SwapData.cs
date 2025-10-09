@@ -5,11 +5,11 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using LabApi.Features.Wrappers;
 using UnityEngine;
 
 namespace ScpSwap.Models
 {
-    using Exiled.API.Features;
     using PlayerRoles;
     using Unity;
 
@@ -42,7 +42,7 @@ namespace ScpSwap.Models
         public void Swap(Player player)
         {
             if (customSwap == null)
-                player.Role.Set(role);
+                player.SetRole(role);
             else
                 customSwap.SpawnMethod(player);
 

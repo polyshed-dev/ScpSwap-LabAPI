@@ -14,7 +14,7 @@ namespace ScpSwap.Configs
     /// </summary>
     public class CommandTranslations
     {
-        /// <summary>
+        /*/// <summary>
         /// Gets or sets a configurable instance of the <see cref="Commands.Accept"/> command.
         /// </summary>
         public Accept Accept { get; set; } = new Accept();
@@ -32,6 +32,11 @@ namespace ScpSwap.Configs
         /// <summary>
         /// Gets or sets a configurable instance of the <see cref="Commands.List"/> command.
         /// </summary>
-        public List List { get; set; } = new List();
+        public List List { get; set; } = new List();*/
+        
+        public AcceptTranslation Accept { get; set; } = new AcceptTranslation();
+        
+        
+        
     }
 }

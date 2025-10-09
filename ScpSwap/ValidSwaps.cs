@@ -5,13 +5,16 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using GameCore;
+using LabApi.Features.Console;
+using LabApi.Features.Wrappers;
+
 namespace ScpSwap
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
-    using Exiled.API.Features;
     using PlayerRoles;
     using ScpSwap.Models;
 
@@ -122,10 +125,10 @@ namespace ScpSwap
         private static void RefreshTranslatableSwaps()
         {
             TranslatableSwapsValue.Clear();
-            if (Plugin.Instance.Translation.TranslatableSwaps == null)
+            if (Plugin.Instance.Config.Translation.TranslatableSwaps == null)
                 return;
 
-            foreach (KeyValuePair<string, RoleTypeId> kvp in Plugin.Instance.Translation.TranslatableSwaps)
+            foreach (KeyValuePair<string, RoleTypeId> kvp in Plugin.Instance.Config.Translation.TranslatableSwaps)
             {
                 if ((Plugin.Instance.Config.BlacklistedScps != null && Plugin.Instance.Config.BlacklistedScps.Contains(kvp.Value))
                     || kvp.Value.GetTeam() != Team.SCPs)
@@ -133,7 +136,7 @@ namespace ScpSwap
 
                 if (NamesValue.Contains(kvp.Key, StringComparison.OrdinalIgnoreCase))
                 {
-                    Log.Debug($"Failed to add a translation that was a duplicate of another swap with the name of {kvp.Key}.");
+                    Logger.Debug($"Failed to add a translation that was a duplicate of another swap with the name of {kvp.Key}.");
                     continue;
                 }
 
@@ -154,7 +157,7 @@ namespace ScpSwap
                 string roleText = role.ToString();
                 if (NamesValue.Contains(roleText, StringComparison.OrdinalIgnoreCase))
                 {
-                    Log.Debug($"Failed to add a translation that was a duplicate of another swap with the name of {roleText}.");
+                    Logger.Debug($"Failed to add a translation that was a duplicate of another swap with the name of {roleText}.");
                     continue;
                 }
 

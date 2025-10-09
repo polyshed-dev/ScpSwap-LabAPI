@@ -5,11 +5,12 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using LabApi.Features.Wrappers;
+
 namespace ScpSwap.Commands
 {
     using System;
     using CommandSystem;
-    using Exiled.API.Features;
     using ScpSwap.Models;
 
     /// <summary>
@@ -32,19 +33,19 @@ namespace ScpSwap.Commands
             Player playerSender = Player.Get(sender);
             if (playerSender == null)
             {
-                response = Plugin.Instance.Translation.ExecutorIsntPlayer;
+                response = Plugin.Instance.Config.Translation.ExecutorIsntPlayer;
                 return false;
             }
 
             Swap swap = Swap.FromReceiver(playerSender);
             if (swap == null)
             {
-                response = Plugin.Instance.Translation.NoPendingRequest;
+                response = Plugin.Instance.Config.Translation.NoPendingRequest;
                 return false;
             }
 
             swap.Decline();
-            response = Plugin.Instance.Translation.SwapRequestCancelled;
+            response = Plugin.Instance.Config.Translation.SwapRequestCancelled;
             return true;
         }
     }

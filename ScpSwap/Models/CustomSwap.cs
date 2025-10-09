@@ -5,11 +5,14 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using GameCore;
+using LabApi.Features.Console;
+using LabApi.Features.Wrappers;
+
 namespace ScpSwap.Models
 {
     using System;
     using System.Collections.Generic;
-    using Exiled.API.Features;
 
     /// <summary>
     /// A container to aid in the swapping of custom classes.
@@ -59,7 +62,7 @@ namespace ScpSwap.Models
             {
                 if (string.Equals(Name, swap.Name, StringComparison.OrdinalIgnoreCase))
                 {
-                    Log.Warn($"Attempted to register a {nameof(CustomSwap)} with a duplicate name of {Name}.");
+                    Logger.Warn($"Attempted to register a {nameof(CustomSwap)} with a duplicate name of {Name}.");
                     return false;
                 }
             }
@@ -77,7 +80,7 @@ namespace ScpSwap.Models
             if (Registered.Remove(this))
                 return true;
 
-            Log.Warn($"Attempted to remove an unregistered {nameof(CustomSwap)} with a name of {Name}.");
+            Logger.Warn($"Attempted to remove an unregistered {nameof(CustomSwap)} with a name of {Name}.");
             return false;
         }
     }

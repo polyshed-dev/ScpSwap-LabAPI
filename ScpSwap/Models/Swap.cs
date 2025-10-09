@@ -5,12 +5,12 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using LabApi.Events.Arguments.PlayerEvents;
+using LabApi.Features.Wrappers;
+
 namespace ScpSwap.Models
 {
     using System.Collections.Generic;
-    using Exiled.API.Features;
-    using Exiled.Events.EventArgs;
-    using Exiled.Events.EventArgs.Player;
     using MEC;
 
     /// <summary>
@@ -30,7 +30,7 @@ namespace ScpSwap.Models
             SendRequestMessages();
             coroutine = Timing.RunCoroutine(RunTimeout());
             Coroutines.Add(coroutine);
-            Exiled.Events.Handlers.Player.ChangingRole += OnChangingRole;
+            LabApi.Events.Handlers.PlayerEvents.ChangingRole += OnChangingRole;
         }
 
         /// <summary>
@@ -109,8 +109,8 @@ namespace ScpSwap.Models
             senderData.Swap(Receiver);
             receiverData.Swap(Sender);
 
-            Plugin.Instance.Translation.SwapSuccessful.SendTo(Sender);
-            Plugin.Instance.Translation.SwapSuccessful.SendTo(Receiver);
+            Plugin.Instance.Config.Translation.SwapSuccessful.SendTo(Sender);
+            Plugin.Instance.Config.Translation.SwapSuccessful.SendTo(Receiver);
             Swaps.Remove(this);
         }
 
@@ -119,7 +119,7 @@ namespace ScpSwap.Models
         /// </summary>
         public void Cancel()
         {
-            Sender.Broadcast(5, "Swap request cancelled!", shouldClearPrevious: true);
+            Sender.SendBroadcast( "Swap request cancelled!", 5,shouldClearPrevious: true);
             Destroy();
         }
 
@@ -128,7 +128,7 @@ namespace ScpSwap.Models
         /// </summary>
         public void Decline()
         {
-            Sender.Broadcast(5, $"{Receiver.DisplayNickname ?? Receiver.Nickname} has declined your swap request.", shouldClearPrevious: true);
+            Sender.SendBroadcast( $"{Receiver.DisplayName ?? Receiver.Nickname} has declined your swap request.",5, shouldClearPrevious: true);
             Destroy();
         }
 
@@ -137,7 +137,7 @@ namespace ScpSwap.Models
             if (coroutine.IsRunning)
                 Timing.KillCoroutines(coroutine);
 
-            Exiled.Events.Handlers.Player.ChangingRole -= OnChangingRole;
+            LabApi.Events.Handlers.PlayerEvents.ChangingRole -= OnChangingRole;
         }
 
         private void Destroy()
@@ -148,14 +148,14 @@ namespace ScpSwap.Models
 
         private void SendRequestMessages()
         {
-            string consoleMessage = Plugin.Instance.Translation.RequestConsoleMessage.Message;
-            consoleMessage = consoleMessage.Replace("$SenderName", Sender.DisplayNickname ?? Sender.Nickname);
+            string consoleMessage = Plugin.Instance.Config.Translation.RequestConsoleMessage.Message;
+            consoleMessage = consoleMessage.Replace("$SenderName", Sender.DisplayName ?? Sender.Nickname);
             consoleMessage = consoleMessage.Replace("$RoleName", ValidSwaps.GetCustom(Sender)?.Name ?? Sender.Role.ToString());
-            Receiver.SendConsoleMessage(consoleMessage, Plugin.Instance.Translation.RequestConsoleMessage.Color);
-            Receiver.Broadcast(Plugin.Instance.Translation.RequestBroadcast);
+            Receiver.SendConsoleMessage(consoleMessage, Plugin.Instance.Config.Translation.RequestConsoleMessage.Color);
+            Receiver.SendBroadcast(Plugin.Instance.Config.Translation.RequestBroadcast,5);
         }
 
-        private void OnChangingRole(ChangingRoleEventArgs ev)
+        private void OnChangingRole(PlayerChangingRoleEventArgs ev)
         {
             if (ev.Player == Sender || ev.Player == Receiver)
                 Cancel();
@@ -164,8 +164,8 @@ namespace ScpSwap.Models
         private IEnumerator<float> RunTimeout()
         {
             yield return Timing.WaitForSeconds(Plugin.Instance.Config.RequestTimeout);
-            Plugin.Instance.Translation.TimeoutSender.SendTo(Sender);
-            Plugin.Instance.Translation.TimeoutReceiver.SendTo(Receiver);
+            Plugin.Instance.Config.Translation.TimeoutSender.SendTo(Sender);
+            Plugin.Instance.Config.Translation.TimeoutReceiver.SendTo(Receiver);
             Destroy();
         }
     }

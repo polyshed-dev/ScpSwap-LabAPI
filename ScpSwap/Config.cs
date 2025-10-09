@@ -5,15 +5,16 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using ScpSwap.Configs;
+
 namespace ScpSwap
 {
     using System;
     using System.ComponentModel;
-    using Exiled.API.Interfaces;
     using PlayerRoles;
 
     /// <inheritdoc />
-    public class Config : IConfig
+    public class Config
     {
         /// <inheritdoc />
         public bool IsEnabled { get; set; } = true;
@@ -72,5 +73,7 @@ namespace ScpSwap
         [Description(
             "Enables/Disables the plugin for users based off of a permission they have, the permission is scpswap.allowed")]
         public bool AllowUserSwapByPermission { get; set; } = false;
+        
+        public Translation Translation { get; set; } = new Translation();
     }
 }
