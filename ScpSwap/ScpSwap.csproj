@@ -45,4 +45,10 @@
     </Reference>
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Exiled.Dev.References" Version="1.0.4" />
+    <PackageReference Include="ExMod.Exiled" Version="9.14.2" />
+    <PackageReference Include="Northwood.LabAPI" Version="1.1.7" />
+  </ItemGroup>
+
 </Project>

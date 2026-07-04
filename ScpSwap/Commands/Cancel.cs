@@ -19,13 +19,13 @@ namespace ScpSwap.Commands
     public class Cancel : ICommand
     {
         /// <inheritdoc />
-        public string Command { get; set; } = "cancel";
+        public string Command { get; set; } = "iptal";
 
         /// <inheritdoc />
-        public string[] Aliases { get; set; } = { "c" };
+        public string[] Aliases { get; set; } = { "i", "cancel", "c" };
 
         /// <inheritdoc />
-        public string Description { get; set; } = "Cancels an active swap request.";
+        public string Description { get; set; } = "Aktif bir değişim isteğini iptal eder.";
 
         /// <inheritdoc />
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)

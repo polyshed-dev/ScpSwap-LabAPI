@@ -5,6 +5,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using System.Threading.Tasks;
 using LabApi.Features.Permissions;
 using LabApi.Features.Wrappers;
 
@@ -33,11 +34,12 @@ namespace ScpSwap.Commands
         public override string Command => "scpswap";
 
         /// <inheritdoc />
-        public override string[] Aliases { get; } = { "swap" };
+        public override string[] Aliases { get; } = { "swap", "ss", "değiştir" };
 
         /// <inheritdoc />
-        public override string Description => "Base command for ScpSwap.";
+        public override string Description => "SCPSwap için ana komut.";
         
+        private static readonly RoleTypeId[] ExclusivePair = { RoleTypeId.Scp079, RoleTypeId.Scp096 };
 
         /// <inheritdoc />
         public sealed override void LoadGeneratedCommands()
@@ -48,6 +50,14 @@ namespace ScpSwap.Commands
             RegisterCommand(new Decline());
             RegisterCommand(new List());
         }
+
+        private static bool BlocksExclusivity(RoleTypeId target)
+        {
+            if (!ExclusivePair.Contains(target))
+                return false;
+            RoleTypeId other = ExclusivePair.First(r => r != target);
+            return Player.List.Any(p => p.Role == other);
+        } 
 
         /// <inheritdoc />
         protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
@@ -73,7 +83,7 @@ namespace ScpSwap.Commands
 
             if (arguments.IsEmpty())
             {
-                response = $"Usage: .{Command} ScpNumber";
+                response = $"Kullanım: .{Command} SCPnumarası (örn.: .{Command} 49)";
                 return false;
             }
 
@@ -126,6 +136,11 @@ namespace ScpSwap.Commands
 
             if (Plugin.Instance.Config.AllowNewScps)
             {
+                if (BlocksExclusivity(resolvedRole))
+                {
+                    
+                }
+                
                 spawnMethod(playerSender);
                 response = Plugin.Instance.Config.Translation.SuccessfulSwap;
                 return true;
@@ -135,12 +150,13 @@ namespace ScpSwap.Commands
             return false;
         }
 
-        private static Player GetReceiver(string request, out Action<Player> spawnMethod)
+        private static Player GetReceiver(string request, out Action<Player> spawnMethod, out RoleTypeId resolvedRole)
         {
             CustomSwap customSwap = ValidSwaps.GetCustom(request);
             if (customSwap != null)
             {
                 spawnMethod = customSwap.SpawnMethod;
+                resolvedRole = RoleTypeId.None;
                 return Player.List.FirstOrDefault(player => customSwap.VerificationMethod(player));
             }
 
@@ -148,10 +164,12 @@ namespace ScpSwap.Commands
             if (roleSwap != RoleTypeId.None)
             {
                 spawnMethod = player => player.SetRole(roleSwap);
+                resolvedRole = roleSwap;
                 return Player.List.FirstOrDefault(player => player.Role == roleSwap);
             }
 
             spawnMethod = null;
+            resolvedRole = roleSwap;
             return null;
         }
     }
